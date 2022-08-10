@@ -1,18 +1,28 @@
+// connect Express server
 const express = require('express')
+
+// enable .env file
+require('dotenv').config()
+
+//Enable colors for terminal (log) messages
+const colors = require('colors')
 
 // GraphQL for express
 const { graphqlHTTP } = require('express-graphql')
 
-//connect GQL schema
+//import GQL schema
 const schema = require('./schema/schema')
 
-// enable .env file
-require('dotenv').config()
+// import Mongo DB connection configuration
+const connectDB = require('./config/db')
 
 const port = process.env.PORT || 5000
 
 // connect express
 const app = express()
+
+// Connect to database
+connectDB()
 
 // connect GraphQL
 app.use(
