@@ -4,6 +4,8 @@ const {
   GraphQLString,
   GraphQLSchema,
   GraphQLList,
+  GraphQLNonNull,
+  GraphQLEnumType,
 } = require('graphql')
 
 // const { projects, clients } = require('../sampleData.js')   // dummy data
@@ -44,7 +46,7 @@ const ProjectType = new GraphQLObjectType({
   }),
 })
 
-//create Root queries object to make a specified queries to GQL Objects - for instance show 'client' information by ID, or get all Clients
+//create Root queries object to make a specified queries to GQL Objects - GET - for instance show 'client' information by ID, or get all Clients
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
@@ -85,7 +87,120 @@ const RootQuery = new GraphQLObjectType({
   },
 })
 
+//Mutations for objects - add Client, add Project etc,
+const mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    // ADD a Client
+    addClient: {
+      type: ClientType, // create Client with type ClientType
+      args: {
+        name: { type: GraphQLNonNull(GraphQLString) }, // 'GraphQLNonNull' enforce that values are never null and can ensure an error is raised if this ever occurs during a request
+        email: { type: GraphQLNonNull(GraphQLString) },
+        phone: { type: GraphQLNonNull(GraphQLString) },
+      },
+
+      // in 'resolve' we're creating new Client using Mongoose - passing data (GQL query arguments - from a frontend form, for instance) to DB
+      resolve(parent, args) {
+        const client = new Client({
+          name: args.name,
+          email: args.email,
+          phone: args.phone,
+        })
+        return client.save() // save to DB
+      },
+    },
+
+    //DELETE a Client
+    deleteClient: {
+      type: ClientType,
+      args: {
+        id: { type: GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        return Client.findByIdAndRemove(args.id)
+      },
+    },
+
+    //ADD a Project
+    addProject: {
+      type: ProjectType,
+      args: {
+        name: { type: GraphQLNonNull(GraphQLString) },
+        description: { type: GraphQLNonNull(GraphQLString) },
+        status: {
+          type: new GraphQLEnumType({
+            name: 'ProjectStatus', //! 'name' should be unique
+            values: {
+              new: { value: 'Not Started' },
+              progress: { value: 'In Progress' },
+              completed: { value: 'Completed' },
+            },
+          }),
+          defaultValue: 'Not Started',
+        },
+        clientId: { type: GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        const project = new Project({
+          name: args.name,
+          description: args.description,
+          status: args.status,
+          clientId: args.clientId,
+        })
+        return project.save()
+      },
+    },
+
+    //DELETE a project
+    deleteProject: {
+      type: ProjectType,
+      args: {
+        id: { type: GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        return Project.findByIdAndRemove(args.id)
+      },
+    },
+
+    //UPDATE the project
+    updateProject: {
+      type: ProjectType,
+      args: {
+        id: { type: GraphQLNonNull(GraphQLString) },
+        name: { type: GraphQLString }, // if name or description is not specified - it's not throw the 'null' error during update
+        description: { type: GraphQLString },
+        status: {
+          type: new GraphQLEnumType({
+            name: 'ProjectStatusUpdate', //! 'name' should be unique
+            values: {
+              new: { value: 'Not Started' },
+              progress: { value: 'In Progress' },
+              completed: { value: 'Completed' },
+            },
+          }),
+        },
+      },
+      resolve(parent, args) {
+        return Project.findByIdAndUpdate(
+          args.id,
+          {
+            $set: {
+              // setting new values, if they come from frontend
+              name: args.name,
+              description: args.description,
+              status: args.status,
+            },
+          },
+          { new: true } // if project with specified id is not in DB it's gonna create new project
+        )
+      },
+    },
+  },
+})
+
 // export Query
 module.exports = new GraphQLSchema({
   query: RootQuery,
+  mutation,
 })
