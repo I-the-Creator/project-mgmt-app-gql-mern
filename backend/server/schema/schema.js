@@ -192,7 +192,7 @@ const mutation = new GraphQLObjectType({
               status: args.status,
             },
           },
-          { new: true } // if project with specified id is not in DB it's gonna create new project
+          { new: true } //! ???? if project with specified id is not in DB it's gonna create new project  ????
         )
       },
     },
