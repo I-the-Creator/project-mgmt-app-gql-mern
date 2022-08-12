@@ -4,6 +4,9 @@ const express = require('express')
 // enable .env file
 require('dotenv').config()
 
+// CORS
+const cors = require('cors')
+
 //Enable colors for terminal (log) messages
 const colors = require('colors')
 
@@ -23,6 +26,9 @@ const app = express()
 
 // Connect to database
 connectDB()
+
+//Enable CORS middleware
+app.use(cors())
 
 // connect GraphQL
 app.use(
