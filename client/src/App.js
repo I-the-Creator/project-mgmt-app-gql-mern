@@ -1,8 +1,11 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client'
 
 import Header from './components/Header/Header'
-import Clients from './components/Clients/Clients'
-import AddClientModal from './components/AddClientModal/AddClientModal'
+import Home from './pages/Home'
+import NotFound from './pages/NotFound'
+import Project from './pages/Project'
 
 // Enable cache and define custom 'merge' function for cache updates
 const cache = new InMemoryCache({
@@ -34,11 +37,16 @@ const App = () => {
   return (
     <>
       <ApolloProvider client={client}>
-        <Header />
-        <div className="container">
-          <AddClientModal />
-          <Clients />
-        </div>
+        <Router>
+          <Header />
+          <div className="container">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/projects/:id" element={<Project />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+        </Router>
       </ApolloProvider>
     </>
   )
