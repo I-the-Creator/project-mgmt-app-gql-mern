@@ -10,19 +10,19 @@ const AddClientModal = () => {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
 
-  // add client mutation; define variables which are used for query; pass the returned data to 'addClient' variable
+  //* add client mutation; define variables which are used for query; pass the returned data to 'addClient' variable
   const [addClient] = useMutation(ADD_CLIENT, {
     variables: { name, email, phone },
 
-    // update cache after 'addClient' mutation - 'data' - values returned from DB after 'addClient' request
+    //* update cache and rerender list of clients after 'addClient' mutation - 'data' - values returned from DB after 'addClient' request
     update(cache, { data: { addClient } }) {
       console.log(addClient) // DEBUG
-      // read from the cached GET_CLIENTS and pass it to 'client' variable
+      //* read from the cached GET_CLIENTS and pass it to 'client' variable
       const { clients } = cache.readQuery({
         query: GET_CLIENTS,
       })
 
-      // WRITE TO the cached GET_CLIENTS new data after adding client
+      //* WRITE TO the cached GET_CLIENTS new data after adding client - - spread (concat) new data to cached data
       cache.writeQuery({
         query: GET_CLIENTS,
         // data: { clients: clients.concat([addClient]) },
@@ -38,6 +38,7 @@ const AddClientModal = () => {
       return alert('Please fill in all fields')
     }
 
+    //* call the 'addClient' function to rin mutation
     addClient(name, email, phone)
 
     //Clean up the form

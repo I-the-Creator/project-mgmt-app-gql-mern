@@ -6,7 +6,7 @@ import { DELETE_CLIENT } from '../../mutations/clientMutations'
 import { GET_CLIENTS } from '../../queries/clientQueries'
 
 const ClientRow = ({ client }) => {
-  // define mutation and pass in arguments(values) whish will feed the mutation query - 'client id'
+  // define deleting client mutation and pass in arguments(values) whish will feed the mutation query - 'client id'
   const [deleteClient] = useMutation(DELETE_CLIENT, {
     variables: { id: client.id },
     // refetchQueries: [{ query: GET_CLIENTS }],
