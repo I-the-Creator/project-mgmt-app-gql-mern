@@ -3,12 +3,16 @@ import { useQuery } from '@apollo/client'
 
 import { GET_PROJECT } from '../queries/projectQueries'
 import Spinner from '../components/Spinner/Spinner'
+import CLientInfo from '../components/ClientInfo/ClientInfo'
+import DeleteProjectButton from '../components/DeleteProjectButton/DeleteProjectButton'
+import EditProjectForm from '../components/EditProjectForm/EditProjectForm'
+
 
 const Project = () => {
-  // get the ID from URL
+  //* get the ID from URL
   const { id } = useParams()
 
-  // make a query to DB by id, get data from query.
+  //* make a query to DB by id, get data from query.
   const { loading, error, data } = useQuery(GET_PROJECT, {
     variables: { id },
   })
@@ -34,7 +38,11 @@ const Project = () => {
           <h5 className="mt-3">Project Status</h5>
           <p className="">{data.project.status}</p>
 
-          <ClientInfo client={data.project.client} />
+          <CLientInfo client={data.project.client} />
+
+          <EditProjectForm project={data.project}/>
+          <DeleteProjectButton projectId={id} />
+      
         </div>
       )}
     </>
